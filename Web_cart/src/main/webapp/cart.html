@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+ <script charset="UTF-8" type="text/javascript">
+window["adrum-start-time"] = new Date().getTime();
+(function(config){
+    config.appKey = "AD-AAB-ADX-WAN";
+    config.adrumExtUrlHttp = "http://cdn.appdynamics.com";
+    config.adrumExtUrlHttps = "https://cdn.appdynamics.com";
+    config.beaconUrlHttp = "http://pdx-col.eum-appdynamics.com";
+    config.beaconUrlHttps = "https://pdx-col.eum-appdynamics.com";
+    config.useHTTPSAlways = true;
+    config.resTiming = {"bufSize":200,"clearResTimingOnBeaconSend":true};
+    config.maxUrlLength = 512;
+})(window["adrum-config"] || (window["adrum-config"] = {}));
+</script>
+<script src="//cdn.appdynamics.com/adrum/adrum-24.4.0.4454.js"></script>
+
+
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - MyStore</title>
+
+<style>
+    header {
+    background-color: #232f3e;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header .logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+}
+
+header nav ul li {
+    display: inline;
+}
+
+header nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.cart-items{
+   text-wrap:balance;
+   font-size:35px;
+   align-items: center;
+   background-color: bisque;
+   border: 3px;
+   padding-left: 500px;
+   
+}
+.total-bill{
+    font-size: 40px;
+    align-items: center;
+   margin-left: 500px;
+}
+.checkout{
+    width: 150px;
+    align-items: center;
+   margin-left: 500px;
+}
+#div{
+text-align:center;
+font-size:25px;
+font-weight: bold;
+background-color: bisque;
+padding:10px;
+border: 1px;
+}
+
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">MyStore</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html">Products</a></li>
+                <li><a href="#">Cart</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="cart-section">
+            <h2>Your Cart</h2>
+           <ul class="cart-items"></ul>
+            <p class="total-bill">Total: $0.00</p>
+            <button class="checkout">Order</button>
+        </section>
+        <br>
+        <br>
+        <div id="div" ></div>>
+    </main>
+
+  <script>
+  
+  const cartItems = document.querySelector('.cart-items');
+  const totalBill = document.querySelector('.total-bill');
+  const message = document.getElementById('div');
+  let total = 0;
+
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+  cart.forEach(item => {
+      const cartItem = document.createElement('li');
+      cartItem.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+      cartItems.appendChild(cartItem);
+      total += item.price;
+  });
+
+  totalBill.textContent = `Total: $${total.toFixed(2)}`;
+
+  document.querySelector('.checkout').addEventListener('click', function() {
+      const cartData = {
+          items: cart,
+          total: total
+      };
+
+      fetch('http://localhost:8080/Web_cart/Run',{
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(cartData)
+      })
+      .then(response => response.json())
+      .then(data => {
+          message.textContent="Order Sucessful";
+          console.log(data);
+      })
+      .catch(error => {
+    	  message.textContent='Order failed !'
+          console.error('Error:', error);
+      });
+  });
+
+  </script>
+</body>
+</html>
